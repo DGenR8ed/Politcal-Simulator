@@ -1,0 +1,114 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Political Simulator: Leader of Canada</title>
+    <style>
+        body {
+            background-color: #1a1a1a;
+            color: #f0f0f0;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        #game {
+            max-width: 800px;
+            margin: auto;
+        }
+        button {
+            background-color: #333;
+            border: none;
+            color: white;
+            padding: 12px;
+            margin-top: 10px;
+            width: 100%;
+            font-size: 16px;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        button:hover {
+            background-color: #444;
+        }
+        .hidden {
+            display: none;
+        }
+        h1, h2 {
+            color: #00bcd4;
+        }
+    </style>
+</head>
+<body>
+<div id="game">
+    <h1>Political Simulator: Leader of Canada</h1>
+    <div id="story"></div>
+    <div id="choices"></div>
+</div>
+
+<script>
+    const gameState = {
+        turn: 0,
+        publicSupport: 60,
+        phase: "year1"
+    };
+
+    const scenarios = {
+        year1: {
+            text: "It is 2025. You are the newly elected Prime Minister of Canada. The country is divided and the economy is shaky. What is your first priority?",
+            choices: [
+                { text: "A) Push for national unity through reform.", next: "year2", effect: () => gameState.publicSupport += 5 },
+                { text: "B) Focus on economic recovery and middle-class growth.", next: "year2", effect: () => gameState.publicSupport += 3 },
+                { text: "C) Make a bold international statement on climate and AI.", next: "year2", effect: () => gameState.publicSupport -= 2 }
+            ]
+        },
+        year2: {
+            text: "Protests emerge over climate inaction, Indigenous leaders request talks, and opposition accuses you of stalling reforms. How do you respond?",
+            choices: [
+                { text: "A) Launch bold new environmental legislation.", next: "year3", effect: () => gameState.publicSupport += 2 },
+                { text: "B) Delay major decisions and build coalitions.", next: "year3", effect: () => gameState.publicSupport -= 1 },
+                { text: "C) Quietly negotiate settlements behind the scenes.", next: "year3", effect: () => gameState.publicSupport += 1 }
+            ]
+        },
+        year3: {
+            text: "A national referendum is approaching. What issue do you highlight to define your leadership?",
+            choices: [
+                { text: "A) Energy modernization and environmental policy.", next: "end", effect: () => gameState.publicSupport += 3 },
+                { text: "B) Senate reform and democratic access.", next: "end", effect: () => gameState.publicSupport += 2 },
+                { text: "C) Digital rights and AI governance.", next: "end", effect: () => gameState.publicSupport += 1 }
+            ]
+        },
+        end: {
+            text: () => {
+                let rating = gameState.publicSupport;
+                if (rating >= 70) return "You are re-elected in a landslide and become a global statesman. Your leadership is praised for balance and foresight.";
+                if (rating >= 60) return "You win re-election with a solid majority. Critics remain, but your core support holds strong.";
+                return "Your leadership was controversial. You lose your majority but remain respected internationally for your diplomacy.";
+            },
+            choices: []
+        }
+    };
+
+    function render() {
+        const current = scenarios[gameState.phase];
+        const storyDiv = document.getElementById("story");
+        const choicesDiv = document.getElementById("choices");
+
+        storyDiv.innerHTML = typeof current.text === "function" ? current.text() : current.text;
+        choicesDiv.innerHTML = "";
+
+        current.choices.forEach(choice => {
+            const btn = document.createElement("button");
+            btn.textContent = choice.text;
+            btn.onclick = () => {
+                choice.effect();
+                gameState.phase = choice.next;
+                render();
+            };
+            choicesDiv.appendChild(btn);
+        });
+    }
+
+    render();
+</script>
+</body>
+</html>
